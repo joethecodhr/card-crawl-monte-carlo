@@ -1,3 +1,14 @@
+(define make-card
+  (let ()
+    (lambda (name type value)
+	(let ()
+	  (lambda (message . args)
+	    (cond ((equal? message 'type) type)
+		  ((equal? message 'value) value)
+		  ((equal? message 'name) name)
+		  ((equal? message 'attack) (set! value (- value (first args))) value)
+		  (else (error "Undefined message on make-card"))))))))
+
 (define base-deck
   (list
    (make-card 'crow 'monster 3)
@@ -54,16 +65,6 @@
    (make-card 'coins 'coin 3)
    (make-card 'coins 'coin 2)))
 
-(define make-card
-  (let ()
-    (lambda ('name type value)
-	(let ()
-	  (lambda (message . args)
-	    (cond ((equal? message 'type) type)
-		  ((equal? message 'value) value)
-		  ((equal? message 'name) name)
-		  ((equal? message 'attack) (set! value (- value (first args))) value)
-		  (else (error "Undefined message on make-card"))))))))
 
 ;; TODO: Fischer-Yates Shuffle
 (define (shuffle-deck deck) deck)
@@ -79,7 +80,7 @@
 	   ((equal? message 'worth) worth)
 	   (else (error "Undefined message on make-player."))))))))
 
-(define (make-deck) (shuffle base-deck))
+(define (make-deck) (shuffle-deck base-deck))
 
 (define (make-game)
   (let ((player (make-player 'knight 13 0))
@@ -89,3 +90,12 @@
 	  (cond ((equal? message 'player) player)
 		((equal? message 'deck) deck)
 		(else (error "Undefined message on make-game"))))))
+
+(define (play-game game)
+  (display "Playing a game.")
+
+  (define (game-iter turn)
+    (cond ((> turn 10) 'end-of-line)
+	  (else game-iter (+ turn 1))))
+
+  (game-iter 0))
