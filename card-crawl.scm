@@ -110,14 +110,18 @@
 		((equal? message 'deck) deck)
 		(else (error "Undefined message on make-game"))))))
 
-(define (is-player-dead? player)
+(define (player-dead? player)
   (< (player 'health) 1))
+
+(define (deck-empty? deck)
+  (equal? deck '())
 
 (define (play-game game)
   (display "Playing a game.")
 
-  (define (game-iter turn)
-    (cond ((is-player-dead? (game 'player)) (begin (display "You lost.") #f))
+  (define (game-iter turn slots)
+    (cond ((player-dead? (game 'player)) (begin (display "You lost.") #f))
+	  ((deck-empty? (game 'deck)) (begin (display "You won!") #f))
 	  ((> turn 10) 'end-of-line)
 	  (else game-iter (+ turn 1))))
 
