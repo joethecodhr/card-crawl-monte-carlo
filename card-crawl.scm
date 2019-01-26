@@ -85,8 +85,22 @@
    (make-potion-cards)
    (make-coin-cards)))
 		   
-;; TODO: Fischer-Yates Shuffle
-(define (shuffle-deck deck) deck)
+(define (shuffle-deck deck)
+  (let ((vector-deck (list->vector deck)))
+
+    (define (iter i)
+	(let ((j (random (length deck))))
+
+	(cond ((= i 0) vector-deck)
+	       (else
+		(let ((j-value (vector-ref vector-deck j))
+		      (i-value (vector-ref vector-deck i)))
+
+		  (vector-set! vector-deck i j-value)
+		  (vector-set! vector-deck j i-value)
+		  (iter (- i 1)))))))
+
+  (vector->list (iter (- (length deck) 1)))))
   
 (define make-player
   (let ()
@@ -114,7 +128,7 @@
   (< (player 'health) 1))
 
 (define (deck-empty? deck)
-  (equal? deck '())
+  (equal? deck '()))
 
 (define (play-game game)
   (display "Playing a game.")
@@ -125,6 +139,4 @@
 	  ((> turn 10) 'end-of-line)
 	  (else game-iter (+ turn 1))))
 
-  (game-iter 0))
-
-(play-game (make-game))
+  (game-iter 0 4))
