@@ -106,37 +106,42 @@
   (let ()
     (lambda (name health worth)
       (let ()
-	(lambda (message)
+	(lambda (message . args)
 	  (cond
 	   ((equal? message 'name) name)
 	   ((equal? message 'health) health)
 	   ((equal? message 'worth) worth)
+	   ((equal? message 'attack) (set! health (- health (car args))) health)
 	   (else (error "Undefined message on make-player."))))))))
 
 (define (make-deck) (shuffle-deck base-deck))
 
 (define (make-game)
   (let ((player (make-player 'knight 13 0))
-	(deck (make-deck)))
+	(deck (make-deck))
+	(slots #(0 0 0 0)))
 
 	(lambda (message)
 	  (cond ((equal? message 'player) player)
 		((equal? message 'deck) deck)
+		((equal? message 'slots) slots)
 		(else (error "Undefined message on make-game"))))))
 
 (define (player-dead? player)
   (< (player 'health) 1))
 
-(define (deck-empty? deck)
-  (equal? deck '()))
+(define (game-over? deck slots)
+  (and (empty? deck) (empty? slots)))
 
 (define (play-game game)
   (display "Playing a game.")
 
-  (define (game-iter turn slots)
-    (cond ((player-dead? (game 'player)) (begin (display "You lost.") #f))
-	  ((deck-empty? (game 'deck)) (begin (display "You won!") #f))
+  (define (game-iter turn)
+    (cond ((player-dead? (game 'player)) (display "You lost.") #f)
+	  ((game-over? (game 'deck) (game 'slots)) (display "You won!") #f)
 	  ((> turn 10) 'end-of-line)
-	  (else game-iter (+ turn 1))))
+	  (else
+	   ((game 'player) 'attack 2)
+	   (game-iter (+ turn 1)))))
 
-  (game-iter 0 4))
+  (game-iter 0))
