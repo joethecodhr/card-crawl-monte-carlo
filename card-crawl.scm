@@ -1,3 +1,9 @@
+(define (log . msg)
+  (display msg)
+  (newline))
+
+(define no-card ())
+
 (define make-card
   (let ()
     (lambda (name type value)
@@ -6,7 +12,10 @@
 	    (cond ((equal? message 'type) type)
 		  ((equal? message 'value) value)
 		  ((equal? message 'name) name)
-		  ((equal? message 'attack) (set! value (- value (first args))) value)
+		  ((equal? message 'attack)
+		   (set! value (- value (first args)))
+		   (log name " was attacked for " value)
+		   value)
 		  (else (error "Undefined message on make-card"))))))))
 
 (define (make-n-cards n name type value)
@@ -116,32 +125,50 @@
 
 (define (make-deck) (shuffle-deck base-deck))
 
+(define the-empty-deck ())
+
+;; TODO: Implement deal-to-next-slot, returns slots method.
+;;                 play-card-against-card, returns game method.
 (define (make-game)
   (let ((player (make-player 'knight 13 0))
 	(deck (make-deck))
-	(slots #(0 0 0 0)))
+	(dealt-cards (make-vector 4 no-card))
+        (active-cards (make-vector 2 no-card))
+	(keep-cards (make-vector 1 no-card)))
 
 	(lambda (message)
 	  (cond ((equal? message 'player) player)
 		((equal? message 'deck) deck)
 		((equal? message 'slots) slots)
+		((equal? message 'deal-card)
+		 (cond ((equal? deck the-empty-deck) the-empty-deck)
+		       (else
+			(let ((card (car deck)))
+			    (set! deck (cdr deck))
+			    card))))
 		(else (error "Undefined message on make-game"))))))
+
+;(define (game-flow game)
+  ;(define (deal-iter empty-slots)
+    ;(cond ((empty? (game 'deck)) the-empty-deck)
+  ; (let
 
 (define (player-dead? player)
   (< (player 'health) 1))
 
 (define (game-over? deck slots)
-  (and (empty? deck) (empty? slots)))
+  (and (empty? deck))) ;; The slot check has been removed since it
+                       ;; is not implemented.
 
 (define (play-game game)
-  (display "Playing a game.")
+  (log "Playing a game.")
 
   (define (game-iter turn)
-    (cond ((player-dead? (game 'player)) (display "You lost.") #f)
-	  ((game-over? (game 'deck) (game 'slots)) (display "You won!") #f)
-	  ((> turn 10) 'end-of-line)
+    (cond ((player-dead? (game 'player)) (log "You lost.") #f)
+	  ((game-over? (game 'deck) (game 'slots)) (log "You won!") #f)
+	  ((> turn 52) 'end-of-line)
 	  (else
-	   ((game 'player) 'attack 2)
+	   (game 'deal-card)
 	   (game-iter (+ turn 1)))))
 
   (game-iter 0))
