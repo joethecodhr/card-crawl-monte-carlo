@@ -27,4 +27,5 @@
 (define d1 (make-deck))
 (define s1 (make-dealer-slots))
 
-(define r1 (deal-card-to-empty-slot d1 s1))
+(define state1 (deal d1 s1))
+(define state2 (deal (first state1) (second state1)))
