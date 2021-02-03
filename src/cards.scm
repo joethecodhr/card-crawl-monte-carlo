@@ -1,4 +1,4 @@
-(define no-card ())
+(define no-card 'no-card)
 
 (define (make-card name type value)
  (cons type (cons name value)))

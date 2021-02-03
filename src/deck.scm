@@ -25,4 +25,4 @@
 
 (define (make-deck) (shuffle-deck base-deck))
 
-(define the-empty-deck ())
+(define the-empty-deck '())
