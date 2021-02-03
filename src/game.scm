@@ -34,3 +34,11 @@
  (cond ((or (< slot-number 0) (> slot-number (- (length slots) 1))) (error "slot-number out of range"))
        ((equal? (slot-card (list-ref slots slot-number)) 'the-empty-slot) (error "slot is empty"))
        (else (error "not-implemented"))))
+
+(define (replace-card-in-slot slot-number slots card)
+  (define (slot-iter return-slots remaining-slots)
+   (cond ((= (length return-slots) (length slots)) return-slots)
+         ((= slot-number (length return-slots)) (slot-iter (append return-slots (list card))))
+         (else (slot-iter (append return-slots (list-tail remaining-slots 1)) (list-tail remaining-slots 1)))))
+
+  (slot-iter '() slots))
