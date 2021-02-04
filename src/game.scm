@@ -29,11 +29,11 @@
   (slot-iter '() slots deck))
 
 ;; Takes a card from a slot
-;; Retunrs (list [card taken] [new slot state])
+;; Returns (list [card taken] [new slot state])
 (define (take-card-from-slot slot-number slots)
  (cond ((or (< slot-number 0) (> slot-number (- (length slots) 1))) (error "slot-number out of range"))
        ((equal? (slot-card (list-ref slots slot-number)) 'the-empty-slot) (error "slot is empty"))
-       (else (error "not-implemented"))))
+       (else (list (list-ref slots slot-number) (replace-card-in-slot slot-number slots 'the-empty-card)))))
 
 (define (replace-card-in-slot slot-number slots card)
   (define (slot-iter return-slots remaining-slots)
