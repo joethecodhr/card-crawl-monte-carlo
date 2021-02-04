@@ -38,7 +38,7 @@
 (define (replace-card-in-slot slot-number slots card)
   (define (slot-iter return-slots remaining-slots)
    (cond ((= (length return-slots) (length slots)) return-slots)
-         ((= slot-number (length return-slots)) (slot-iter (append return-slots (list card))))
-         (else (slot-iter (append return-slots (list-tail remaining-slots 1)) (list-tail remaining-slots 1)))))
+         ((= slot-number (length return-slots)) (slot-iter (append return-slots (list card)) (list-tail remaining-slots 1)))
+         (else (slot-iter (append return-slots (list (list-ref remaining-slots 0))) (list-tail remaining-slots 1)))))
 
   (slot-iter '() slots))

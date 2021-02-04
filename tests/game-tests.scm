@@ -8,7 +8,12 @@
   ((_ fn expected)
    (let* ((result fn))
     (if (equal? result expected)
-     (printf "PASS\n")
+     (begin
+      (printf "PASS: Expected: ")
+      (display fn)
+      (printf " Actual: ")
+      (display result)
+      (printf "\n"))
      (begin
       (printf "FAIL: Expected: ")
       (display expected)
@@ -16,6 +21,7 @@
       (display result)
       (printf "\n")))))))
 
-(assert-equals #t #t)
-(assert-equals (replace-card-in-slot 0 '() 'the-empty-card) (list 'the-empty-card))
-
+(assert-equals (replace-card-in-slot 0 '() 'foo) '())
+(assert-equals (replace-card-in-slot 0 '(1) 'foo) (list 'foo))
+(assert-equals (replace-card-in-slot 0 '(1 2 3 4) 'foo) (list 'foo 2 3 4))
+(assert-equals (replace-card-in-slot 3 '(1 2 3 4) 'foo) (list 1 2 3 'foo))
