@@ -25,4 +25,4 @@
 ;;      * The cost of this starts at 5 health, and goes up by +2 each usage
 
 (define (play-a-game)
- (display (play-game make-game)))
+ (display (play-game (make-new-game))))

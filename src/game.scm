@@ -1,15 +1,18 @@
-(define make-game
+(define (make-game deck dealer-slots player-slots discard-pile sacrifice-counter game-state)
  (list
   ;; dealers deck
-  (make-deck)
+  deck
   ;; playfield
-  (cons (make-dealer-slots) (make-player-slots))
+  (cons dealer-slots player-slots)
   ;; the discard pile
-  the-empty-deck
+  discard-pile
   ;; sacrifice counter
-  0
+  sacrifice-counter
   ;; game state
-  'game-not-started))
+  game-state))
+
+(define (make-new-game)
+ (make-game (make-deck) (make-dealer-slots) (make-player-slots) 'the-empty-deck 0 'game-not-started))
 
 (define (deck game) (list-ref game 0))
 (define (dealer-slots game) (car (list-ref game 1)))
@@ -49,8 +52,8 @@
 ;; Takes a card from a slot
 ;; Returns (list [card taken] [new slot state])
 (define (take-card-from-slot slot-number slots)
- (cond ((or (< slot-number 0) (> slot-number (- (length slots) 1))) (error "slot-number out of range"))
-       ((equal? (slot-card (list-ref slots slot-number)) 'the-empty-slot) (error "slot is empty"))
+ (cond ((or (< slot-number 0) (> slot-number (- (length slots) 1))) (error 'take-card-from-slot "slot-number out of range"))
+       ((equal? (slot-card (list-ref slots slot-number)) 'the-empty-slot) (error 'take-card-from-slot "slot is empty"))
        (else (list (list-ref slots slot-number) (replace-card-in-slot slot-number slots 'the-empty-card)))))
 
 ;; Replaces a card in a slot
@@ -89,9 +92,9 @@
       (display new-turn-count)
       (display "\n")
 
-      (cond ((player-is-dead? end-of-turn-state) (display "player-is-dead") (end-of-turn-state))
-            ((dealer-slots-empty? end-of-turn-state) (display "player-won") (end-of-turn-state))
-            ((> new-turn-count 100) (display "turn-count-too-high") (end-of-turn-state))
+      (cond ((player-is-dead? end-of-turn-state) (display "player-is-dead") end-of-turn-state)
+            ((dealer-slots-empty? end-of-turn-state) (display "player-won") end-of-turn-state)
+            ((> new-turn-count 100) (display "turn-count-too-high") end-of-turn-state)
             (else (game-loop end-of-turn-state new-turn-count)))))
 
   (game-loop game 0))

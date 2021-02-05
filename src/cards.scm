@@ -7,12 +7,12 @@
 
 (define (card-type-check-generator type) (lambda (card) (equal? type (card-type card))))
 
-(define monster-card? (type-check-generator 'monster))
-(define sword-card? (type-check-generator 'sword))
-(define shield-card? (type-check-generator 'shield))
-(define coin-card? (type-check-generator 'coin))
-(define potion-card? (type-check-generator 'potion))
-(define player-card? (type-check-generator 'player))
+(define monster-card? (card-type-check-generator 'monster))
+(define sword-card? (card-type-check-generator 'sword))
+(define shield-card? (card-type-check-generator 'shield))
+(define coin-card? (card-type-check-generator 'coin))
+(define potion-card? (card-type-check-generator 'potion))
+(define player-card? (card-type-check-generator 'player))
 
 (define (make-n-cards n name type value)
   (define (card-iter cards num)
