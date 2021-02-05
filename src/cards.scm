@@ -3,6 +3,17 @@
 (define (make-card name type value)
  (cons type (cons name value)))
 
+(define (card-type card) (car card))
+
+(define (card-type-check-generator type) (lambda (card) (equal? type (card-type card))))
+
+(define monster-card? (type-check-generator 'monster))
+(define sword-card? (type-check-generator 'sword))
+(define shield-card? (type-check-generator 'shield))
+(define coin-card? (type-check-generator 'coin))
+(define potion-card? (type-check-generator 'potion))
+(define player-card? (type-check-generator 'player))
+
 (define (make-n-cards n name type value)
   (define (card-iter cards num)
     (cond ((= num n) cards)
@@ -73,3 +84,10 @@
   
 (define (make-player-card name health)
  (make-card name 'player health))
+
+(define (play-card card target-card)
+  (cond ((and (monster-card? card) (player-card? target-card)) (display "monster-vs-player"))
+        ((and (monster-card? card) (shield-card? target-card)) (display "monster-vs-player"))
+        ((and (sword-card? card) (monster-card? target-card)) (display "sword-vs-monster"))
+        ((and (potion-card? card) (player-card? target-card)) (display "potion-vs-player"))
+        (else (display "unknown card-vs-card choice"))))
