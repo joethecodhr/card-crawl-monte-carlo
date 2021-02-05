@@ -24,8 +24,5 @@
 ;;    * If no actions have been taken, sacrifice 5 health to shuffle the current cards into the deck and redeal.
 ;;      * The cost of this starts at 5 health, and goes up by +2 each usage
 
-(define d1 (make-deck))
-(define s1 (make-dealer-slots))
-
-(define state1 (deal d1 s1))
-(define state2 (deal (first state1) (second state1)))
+(define (play-a-game)
+ (display (play-game make-game)))
