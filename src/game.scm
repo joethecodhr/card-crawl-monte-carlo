@@ -7,18 +7,30 @@
   ;; the discard pile
   the-empty-deck
   ;; sacrifice counter
-  0))
+  0
+  ;; game state
+  'game-not-started))
+
+(define (deck game) (list-ref game 0))
+(define (dealer-slots game) (car (list-ref game 1)))
+(define (player-slots game) (cdr (list-ref game 1)))
+(define (discard-pile game) (list-ref game 2))
+(define (sacrifice-counter game) (list-ref game 3))
+(define (game-state game) (list-ref game 4))
 
 ;; Deal cards into empty slots, until there are no more empty slots.
 ;; Returns (list [new deck state] [new slot state])
-(define (deal deck slots)
+(define (deal game)
+ (let* ((game-deck (deck game))
+        (slots (dealer-slots game)))
+
   (define (slot-iter new-slots remaining-slots remaining-deck)
    (cond
     ((= (length new-slots) (length slots)) (list remaining-deck new-slots))
     ((= (length remaining-deck) 0) (list remaining-deck new-slots))
     (else
-     (let ((test-slot (first remaining-slots))
-           (top-card (first remaining-deck)))
+     (let ((test-slot (list-ref remaining-slots 0))
+           (top-card (list-ref remaining-deck 0)))
       (cond ((= (length new-slots) (length slots))
              new-slots)
             ((equal? (slot-card test-slot) 'the-empty-slot)
@@ -26,7 +38,13 @@
             (else
              (slot-iter (append new-slots (list test-slot)) (list-tail remaining-slots 1) remaining-deck)))))))
 
-  (slot-iter '() slots deck))
+  (let ((post-deal-state (slot-iter '() slots game-deck)))
+   (list
+    (list-ref post-deal-state 0)
+    (cons (list-ref post-deal-state 1) (player-slots game))
+    (discard-pile game)
+    (sacrifice-counter game)
+    (game-state game)))))
 
 ;; Takes a card from a slot
 ;; Returns (list [card taken] [new slot state])
@@ -35,6 +53,8 @@
        ((equal? (slot-card (list-ref slots slot-number)) 'the-empty-slot) (error "slot is empty"))
        (else (list (list-ref slots slot-number) (replace-card-in-slot slot-number slots 'the-empty-card)))))
 
+;; Replaces a card in a slot
+;; Returns [new slot state]
 (define (replace-card-in-slot slot-number slots card)
   (define (slot-iter return-slots remaining-slots)
    (cond ((= (length return-slots) (length slots)) return-slots)
@@ -42,3 +62,36 @@
          (else (slot-iter (append return-slots (list (list-ref remaining-slots 0))) (list-tail remaining-slots 1)))))
 
   (slot-iter '() slots))
+
+;; Game over conditions.
+(define (player-is-dead? game) #f)
+(define (dealer-slots-empty? game) #f)
+
+;; Game loop!
+(define (do-nothing-action state) state)
+(define (determine-player-action game) do-nothing-action)
+
+(define (one-turn game player-action-fn)
+ (let* ((post-deal-state (deal game))
+        (post-player-action-state (player-action-fn post-deal-state)))
+  post-player-action-state))
+
+(define (play-game game)
+  (define (game-loop game-state turn-count)
+   (display game-state)
+   (display "\n")
+
+   (let* ((player-action (determine-player-action game-state))
+          (end-of-turn-state (one-turn game-state player-action))
+          (new-turn-count (+ turn-count 1)))
+
+      (display "turn ")
+      (display new-turn-count)
+      (display "\n")
+
+      (cond ((player-is-dead? end-of-turn-state) (display "player-is-dead") (end-of-turn-state))
+            ((dealer-slots-empty? end-of-turn-state) (display "player-won") (end-of-turn-state))
+            ((> new-turn-count 100) (display "turn-count-too-high") (end-of-turn-state))
+            (else (game-loop end-of-turn-state new-turn-count)))))
+
+  (game-loop game 0))
