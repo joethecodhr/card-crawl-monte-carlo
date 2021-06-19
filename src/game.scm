@@ -32,7 +32,7 @@
     ((= (length new-slots) (length slots)) (list remaining-deck new-slots))
     ((= (length remaining-deck) 0) (list remaining-deck new-slots))
     (else
-     (let ((test-slot (list-ref remaining-slots 0))
+     (let ((test-slot (car remaining-slot))
            (top-card (list-ref remaining-deck 0)))
       (cond ((= (length new-slots) (length slots))
              new-slots)
@@ -62,7 +62,7 @@
   (define (slot-iter return-slots remaining-slots)
    (cond ((= (length return-slots) (length slots)) return-slots)
          ((= slot-number (length return-slots)) (slot-iter (append return-slots (list card)) (list-tail remaining-slots 1)))
-         (else (slot-iter (append return-slots (list (list-ref remaining-slots 0))) (list-tail remaining-slots 1)))))
+         (else (slot-iter (append return-slots (list (car remaining-slots))) (list-tail remaining-slots 1)))))
 
   (slot-iter '() slots))
 
